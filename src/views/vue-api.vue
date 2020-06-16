@@ -109,7 +109,8 @@
 
 <script>
 import $ from 'jquery'
-// import axios from 'axios'
+import axios from 'axios'
+import qs from 'qs'
 
 export default {
   name: "",
@@ -163,6 +164,20 @@ export default {
         birthday: this.addUserItems.data.birthday,
         age: this.addUserItems.data.age
       })
+      let data = qs.stringify({
+        name: this.addUserItems.data.name,
+        birthday: this.addUserItems.data.birthday,
+        age: this.addUserItems.data.age
+        })
+      axios.post("http://127.0.0.1:880/api/add.php", data)
+        .then(res => {
+          console.log(res);
+          this.items.push({
+            name: this.addUserItems.data.name,
+            birthday: this.addUserItems.data.birthday,
+            age: this.addUserItems.data.age
+          });
+        });
       $('#exampleModal').modal('hide')
     },
     // 修改

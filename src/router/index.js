@@ -22,6 +22,11 @@ Vue.use(VueRouter)
     path: '/welcome',
     name: 'welcome',
     component: () => import(/* webpackChunkName: "about" */ '../views/welcome.vue')
+  },
+  {
+    path: '/vue-api',
+    name: 'vue-api',
+    component: () => import(/* webpackChunkName: "about" */ '../views/vue-api.vue')
   }
 ]
 
