@@ -22,7 +22,7 @@
         <td>{{ item.birthday }}</td>
         <td>{{ item.age }}</td>
         <td>
-        <button class="btn btn-outline-info" data-toggle="modal" data-target="#updateModal" @click="getRow(item.id)">修改</button>
+        <button class="btn btn-outline-info mr-2" data-toggle="modal" data-target="#updateModal" @click="getRow(item.id)">修改</button>
         <button class="btn btn-outline-warning" @click="deleteRow(item.id)">刪除</button>
         </td>
       </tr>
@@ -111,6 +111,7 @@
 import $ from 'jquery'
 import axios from 'axios'
 import qs from 'qs'
+// import _ from "lodash"
 
 export default {
   name: "",
@@ -126,9 +127,9 @@ export default {
         { text: '新增', type:'button',align: 'center'}
       ],
       list:[
-        { id: 1, name:'Mark', birthday:'1/11', age:'20'},
-        { id: 2, name:'Jacob', birthday:'2/22', age:'22'},
-        { id: 3, name:'Larry', birthday:'3/33', age:'33'}
+        // { id: 1, name:'Mark', birthday:'1/11', age:'20'},
+        // { id: 2, name:'Jacob', birthday:'2/22', age:'22'},
+        // { id: 3, name:'Larry', birthday:'3/33', age:'33'}
       ],
       addUserItems: {
         data: {
@@ -156,6 +157,28 @@ export default {
   },
   methods: {
     // 初始
+    getList() {
+      // console.log(this.list)
+        axios.get("http://127.0.0.1:880/api/list.php").then(res => {
+          // this.list = res.data.data;
+          console.log(this.list)
+          let items = []
+          res.data.data.forEach(el => {
+            let obj = {}
+            el.forEach((e,i) => {
+              console.log(e,i)
+              if (i === 0) obj['id'] = e
+              if (i === 1) obj['name'] = e
+              if (i === 2) obj['birthday'] = e
+              if (i === 3) obj['age'] = e
+            })
+            items.push(obj)
+          })
+          console.log('items >>>', items)
+          this.list = items;
+          // this.itemsAll = res.data.data;
+        });
+      },
     // 新增
     addRow() {
       this.list.push({
@@ -172,11 +195,12 @@ export default {
       axios.post("http://127.0.0.1:880/api/add.php", data)
         .then(res => {
           console.log(res);
-          this.items.push({
+          this.list.push({
             name: this.addUserItems.data.name,
             birthday: this.addUserItems.data.birthday,
             age: this.addUserItems.data.age
           });
+          this.getList()
         });
       $('#exampleModal').modal('hide')
     },
@@ -194,15 +218,27 @@ export default {
     },
     // 修改完成
     updateRow(id){
+      console.log(this.editUserItems)
+      let data = qs.stringify({
+          id: id,
+          name: this.editUserItems.data.name,
+          birthday: this.editUserItems.data.birthday,
+          age: this.editUserItems.data.age
+        });
       console.log(id)
+      axios.post("http://127.0.0.1:880/api/update.php", data)
+      .then(res => {
+      console.log(res)
+      // let obj = _.cloneDeep(this.list); //需拷貝舊的值來用
       this.list.forEach((el, i) => {
         console.log(el, i)
         if(id === el.id){
           console.log('el',el.id)
           this.list[i].name = this.editUserItems.data.name
-          this.list[i].birthday =this.editUserItems.data.birthday
+          this.list[i].birthday = this.editUserItems.data.birthday
           this.list[i].age = this.editUserItems.data.age
-        }
+          }
+        });
       });
       $('#updateModal').modal('hide')
     },
@@ -226,6 +262,7 @@ export default {
   created: function() {
     //實體建立完成。資料 $data 已可取得，但 $el 屬性還未被建立。
     this.src = this.$options.__file ;
+    this.getList()
   },
   beforeMount: function() {
     //執行元素掛載之前。
